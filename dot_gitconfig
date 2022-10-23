@@ -8,7 +8,7 @@
 [push]
 	default = simple
 [ghq]
-	root = /home/masa/src
+	root = ~/src
 [init]
 	defaultBranch = main
 
