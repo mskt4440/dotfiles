@@ -1,0 +1,14 @@
+[user]
+	name = Masa Kato
+	email = mskt4440@gmail.com
+[merge]
+	ff = false
+[pull]
+	ff = only
+[push]
+	default = simple
+[ghq]
+	root = /home/masa/src
+[init]
+	defaultBranch = main
+

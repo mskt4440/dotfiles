@@ -1,0 +1,42 @@
+# bashrc
+## If not running interactively, don't do anything
+case $- in
+    *i*) ;;
+      *) return;;
+esac
+
+## History
+HISTSIZE=1000
+HISTFILESIZE=5000
+HISTCONTROL=ignoreboth
+HISTIGNORE=ls:ll:la:pwd
+HISTTIMEFORMAT='%Y/%m/%d %H:%M:%S '
+
+shopt -s histappend
+shopt -s checkwinsize
+
+## Color
+# make less more friendly for non-text input files, see lesspipe(1)
+[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+
+# enable color support of ls and also add handy aliases
+if [ -x /usr/bin/dircolors ]; then
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    alias ls='ls --color=auto'
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+fi
+
+## Alias
+alias ll='ls -aFhl'
+alias la='ls -AFhl'
+
+# Completion
+if ! shopt -oq posix; then
+  if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+  elif [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+  fi
+fi
