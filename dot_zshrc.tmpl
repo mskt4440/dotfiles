@@ -8,7 +8,16 @@ fi
 bindkey -e
 
 # History
-setopt histignoredups histignorealldups sharehistory
+setopt hist_expire_dups_first # Expire A duplicate event first when trimming history.
+setopt hist_find_no_dups      # Do not display a previously found event.
+setopt hist_ignore_all_dups   # Remove older duplicate entries from history.
+setopt hist_ignore_dups       # Do not record an event that was just recorded again.
+setopt hist_ignore_space      # Do not record an Event Starting With A Space.
+setopt hist_reduce_blanks     # Remove superfluous blanks from history items.
+setopt hist_save_no_dups      # Do not write a duplicate event to the history file.
+setopt hist_verify            # Do not execute immediately upon history expansion.
+setopt inc_append_history     # Write to the history file immediately, not when the shell exits.
+setopt share_history          # Share history between different instances of the shell.
 HISTSIZE=10000
 SAVEHIST=10000
 HISTFILE=~/.zsh_history
@@ -22,69 +31,73 @@ bindkey "^[OB" history-beginning-search-forward-end
 
 # Alias
 alias history='history -i'
-alias ls='ls --color=auto'
-alias l='ls -A'
-alias ll='ls -aFhl'
-alias la='ls -AFhl'
 alias mv='mv -i'
 alias rm='rm -i'
 alias q='exit'
 alias c='clear'
 
+alias ls='ls --color=auto'
+alias l='ls -A'
+alias ll='ls -aFhl'
+
+if [[ $(command -v exa) ]]; then
+  alias exa='exa --icons'
+  alias ls='exa'
+  alias ll='exa -algh'
+fi
+
 # etc
-setopt autocd autopushd
-setopt correct
+setopt auto_cd              # Use cd by typing directory name if it's not a command.
+setopt auto_list            # Automatically list choices on ambiguous completion.
+setopt auto_pushd           # Make cd push the old directory onto the directory stack.
+setopt correct              # 
+setopt auto_param_slash     #
+setopt mark_dirs            #
 
 {{ if eq .chezmoi.os "linux" }}
 # linuxbrew
 export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
 {{ end }}
+# Enabling brew completions
+#if type brew &>/dev/null; then
+if [[ $(command -v brew) ]]; then
+  FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH
+fi
 
-# zi
+# Zi
 #source <(curl -sL https://git.io/zi-loader); zzinit
 typeset -A ZI
 ZI[BIN_DIR]="${HOME}/.zi/bin"
 source "${ZI[BIN_DIR]}/zi.zsh"
-ZI[ZMODULES_DIR]="${HOME}/.zi/zmodules"
-ZI[ZCOMPDUMP_PATH]="${HOME}/.cache/zi/.zcompdump"
 
+# Enabling Zi completions
 autoload -Uz _zi
 (( ${+_comps} )) && _comps[zi]=_zi
-ZI[COMPS_ENABLED]=1
-
-if [[ -f "${ZI[ZMODULES_DIR]}/zpmod/Src/zi/zpmod.so" ]]; then
-  [[ $verbose_mode == true ]] && builtin print "(ZI): Loading ZI module."
-  module_path+=( "${ZI[ZMODULES_DIR]}/zpmod/Src" )
-  zmodload zi/zpmod &>/dev/null
-  ZI[ZPMOD_ENABLED]=1
-fi
 
 # plugin
-zi ice depth=1; zi light romkatv/powerlevel10k
-zi light zsh-users/zsh-autosuggestions
-zi light zsh-users/zsh-syntax-highlighting
-zi light zsh-users/zsh-completions
-zi ice lucid wait'0'
-zi light joshskidmore/zsh-fzf-history-search 
+zi ice depth=1
+zi light romkatv/powerlevel10k
+zi wait lucid for \
+  zsh-users/zsh-syntax-highlighting \
+  joshskidmore/zsh-fzf-history-search \
+  atload"_zsh_autosuggest_start" \
+    zsh-users/zsh-autosuggestions \
+  atload"ZI[COMPINIT_OPTS]=-Uz; zicompinit; zicdreplay" blockf \
+    zsh-users/zsh-completions
 
-# Use modern completion system
-autoload -Uz compinit
-compinit
-
-autoload colors
-colors
-
+# Color
 export LSCOLORS=exgxcxdxcxegedabagacad
 export LS_COLORS='rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:'
 
+# Completion
+zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
 zstyle ':completion:*' auto-description 'specify: %d'
 zstyle ':completion:*' completer _expand _complete _match _prefix _approximate _list _history
 zstyle ':completion:*' format '%B%F{yellow}%d%f%b'   
 zstyle ':completion:*' group-name ''
-zstyle ':completion:*' menu select=2
-zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
 zstyle ':completion:*' list-prompt %SAt %p: Hit TAB for more, or the character to insert%s
 zstyle ':completion:*' matcher-list '' 'm:{a-z}={A-Z}' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=* l:|=*'
+zstyle ':completion:*' menu select=2
 zstyle ':completion:*' menu select=long
 zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p%s
 zstyle ':completion:*' use-compctl false
@@ -92,9 +105,6 @@ zstyle ':completion:*' verbose true
 
 zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
 zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
-
-setopt auto_param_slash
-setopt mark_dirs
 
 # ghq-fzf
 function ghq-fzf() {
@@ -113,5 +123,3 @@ bindkey '^g' ghq-fzf
 
 # fzf
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-#export FZF_TMUX=1
-#export FZF_TMUX_OPTS="-p 80%"
