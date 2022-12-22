@@ -7,6 +7,15 @@ fi
 
 bindkey -e
 
+{{ if eq .chezmoi.os "linux" }}
+# linuxbrew
+export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
+{{ end }}
+# Enabling brew completions
+if [[ $(command -v brew) ]]; then
+  FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH
+fi
+
 # History
 setopt hist_expire_dups_first # Expire A duplicate event first when trimming history.
 setopt hist_find_no_dups      # Do not display a previously found event.
@@ -29,6 +38,16 @@ zle -N history-beginning-search-forward-end history-search-end
 bindkey "^[OA" history-beginning-search-backward-end
 bindkey "^[OB" history-beginning-search-forward-end
 
+# Etc
+setopt auto_cd              # Use cd by typing directory name if it's not a command.
+setopt auto_list            # Automatically list choices on ambiguous completion.
+setopt auto_pushd           # Make cd push the old directory onto the directory stack.
+setopt correct              #
+setopt auto_param_slash     # When a directory is completed, add a trailing slash instead of a space.
+setopt mark_dirs            #
+setopt auto_menu            # Display the completion menu after two use of the TAB key.
+setopt glob_complete        # Trigger the completion after a glob * instead of expanding it.
+
 # Alias
 alias history='history -i'
 alias mv='mv -i'
@@ -36,32 +55,15 @@ alias rm='rm -i'
 alias q='exit'
 alias c='clear'
 
-alias ls='ls --color=auto'
-alias l='ls -A'
-alias ll='ls -aFhl'
-
 if [[ $(command -v exa) ]]; then
   alias exa='exa --icons'
   alias ls='exa'
   alias ll='exa -algh'
-fi
-
-# etc
-setopt auto_cd              # Use cd by typing directory name if it's not a command.
-setopt auto_list            # Automatically list choices on ambiguous completion.
-setopt auto_pushd           # Make cd push the old directory onto the directory stack.
-setopt correct              # 
-setopt auto_param_slash     #
-setopt mark_dirs            #
-
-{{ if eq .chezmoi.os "linux" }}
-# linuxbrew
-export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
-{{ end }}
-# Enabling brew completions
-#if type brew &>/dev/null; then
-if [[ $(command -v brew) ]]; then
-  FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH
+  alias tree='exa -T'
+else
+  alias ls='ls --color=auto'
+  alias l='ls -A'
+  alias ll='ls -aFhl'
 fi
 
 # Zi
@@ -90,14 +92,15 @@ export LSCOLORS=exgxcxdxcxegedabagacad
 export LS_COLORS='rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:'
 
 # Completion
-zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
 zstyle ':completion:*' auto-description 'specify: %d'
 zstyle ':completion:*' completer _expand _complete _match _prefix _approximate _list _history
-zstyle ':completion:*' format '%B%F{yellow}%d%f%b'   
+zstyle ':completion:*' format '%B%F{yellow}%d%f%b'
 zstyle ':completion:*' group-name ''
+zstyle ':completion:*' menu select=2
+zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
+zstyle ':completion:*' list-colors ''
 zstyle ':completion:*' list-prompt %SAt %p: Hit TAB for more, or the character to insert%s
 zstyle ':completion:*' matcher-list '' 'm:{a-z}={A-Z}' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=* l:|=*'
-zstyle ':completion:*' menu select=2
 zstyle ':completion:*' menu select=long
 zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p%s
 zstyle ':completion:*' use-compctl false
