@@ -56,11 +56,11 @@ alias rm='rm -i'
 alias q='exit'
 alias c='clear'
 
-if [[ $(command -v exa) ]]; then
-  alias exa='exa --icons'
-  alias ls='exa'
-  alias ll='exa -algh'
-  alias tree='exa -T'
+if [[ $(command -v eza) ]]; then
+  alias eza='eza --icons'
+  alias ls='eza'
+  alias ll='eza -algh'
+  alias tree='eza -T'
 else
   alias ls='ls --color=auto'
   alias l='ls -A'
