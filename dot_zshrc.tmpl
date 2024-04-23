@@ -81,7 +81,6 @@ zi ice depth=1
 zi light romkatv/powerlevel10k
 zi wait lucid for \
   zsh-users/zsh-syntax-highlighting \
-  joshskidmore/zsh-fzf-history-search \
   atload"_zsh_autosuggest_start" \
     zsh-users/zsh-autosuggestions \
   atload"ZI[COMPINIT_OPTS]=-Uz; zicompinit; zicdreplay" blockf \
@@ -112,7 +111,7 @@ zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
 # ghq-fzf
 function ghq-fzf() {
 local src=$(ghq list | fzf --preview "bat --color=always --style=header,grid --line-range :80 $(ghq root)/{}/README.*")
-  if [ -n "$src" ]; then
+  if [[ -n "$src" ]]; then
     BUFFER="cd $(ghq root)/$src"
     zle accept-line
   fi
@@ -126,3 +125,12 @@ bindkey '^g' ghq-fzf
 
 # fzf
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# fzf
+if type fzf &>/dev/null; then
+  eval "$(fzf --zsh)"
+  FZF_TMUX=1
+  FZF_TMUX_OPTS="-p 80%"
+fi
+
+[[ -f ~/fzf-git.sh ]] && source ~/fzf-git.sh

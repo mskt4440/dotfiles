@@ -1,0 +1,66 @@
+# Plugins
+set -g @plugin 'tmux-plugins/tpm'
+set -g @plugin 'tmux-plugins/tmux-sensible'
+set -g @plugin 'tmux-plugins/tmux-prefix-highlight'
+set -g @plugin 'tmux-plugins/tmux-continuum'
+set -g @plugin 'tmux-plugins/tmux-resurrect'
+set -g @plugin 'sainnhe/tmux-fzf'
+
+# prefix_highlight
+set -g @prefix_highlight_prefix_prompt 'Wait'
+set -g @prefix_highlight_fg 'white'
+set -g @prefix_highlight_bg 'cyan'
+set -g @prefix_highlight_show_copy_mode 'on'
+set -g @prefix_highlight_copy_prompt 'Copy'
+set -g @prefix_highlight_show_sync_mode 'on'
+set -g @prefix_highlight_sync_prompt 'Sync'
+set -g @prefix_highlight_sync_mode_attr 'fg=default,bg=green'
+
+# tmux-continuum
+set -g @continuum-restore 'on'
+set -g @continuum-save-interval '1'
+
+# tmux-fzf
+TMUX_FZF_OPTIONS="-p80%,60% -m"
+bind-key "w" run-shell -b "~/.tmux/plugins/tmux-fzf/scripts/window.sh switch"
+TMUX_FZF_WINDOW_FORMAT="#{window_name} #{b:pane_current_path}"
+
+# copy mode
+setw -g mode-keys vi
+unbind -T copy-mode-vi Enter
+bind-key -T copy-mode-vi v     send-keys -X begin-selection
+bind-key -T copy-mode-vi C-v   send-keys -X rectangle-toggle
+
+{{ if eq .chezmoi.os "linux" }}
+{{   if (.chezmoi.kernel.osrelease | lower | contains "microsoft") }}
+bind-key -T copy-mode-vi Enter send-keys -X copy-pipe-and-cancel "cat | win32yank.exe -i"
+bind-key -T copy-mode-vi y send-keys -X copy-pipe-and-cancel "cat | win32yank.exe -i"
+bind-key C-p run-shell "win32yank -o | tmux load-buffer - && tmux paste-buffer"
+{{   end }}
+{{ end }}
+{{ if eq .chezmoi.os "darwin" }}
+bind-key -T copy-mode-vi Enter send-keys -X copy-pipe-and-cancel "pbcopy"
+bind-key -T copy-mode-vi y     send-keys -X copy-pipe-and-cancel "pbcopy"
+bind-key C-p run-shell "pbpaste | tmux load-buffer - && tmux paste-buffer"
+{{ end }}
+
+# Status Line
+set -g status-style fg=white,bg=black
+set -g status-interval 1
+set -g status-left-length 100
+set -g status-left " #S #I #P #{prefix_highlight}"
+set -g status-justify absolute-centre
+set -g automatic-rename on
+set -g window-status-format         '#I:#{?#{m:#W,zsh},#(basename #{pane_current_path}),#W}#F'
+set -g window-status-current-format '#I:#{?#{m:#W,zsh},#(basename #{pane_current_path}),#W}#F'
+set -g status-right "%H:%M:%S"
+
+# Keybind
+set -g prefix C-\\
+unbind C-b
+
+# Terminal
+set -g default-terminal "tmux-256color"
+set -ga terminal-overrides ",xterm-256color:Tc"
+set -g mouse on
+run '~/.tmux/plugins/tpm/tpm'
