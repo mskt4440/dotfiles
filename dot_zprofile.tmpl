@@ -4,4 +4,3 @@ ssh-add --apple-use-keychain $HOME/.ssh/id_ed25519
 {{ else if  eq .chezmoi.os "linux" }}
 /usr/bin/keychain -q --nogui $HOME/.ssh/id_ed25519
 source $HOME/.keychain/`hostname`-sh
-
