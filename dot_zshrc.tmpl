@@ -52,7 +52,6 @@ setopt glob_complete        # Trigger the completion after a glob * instead of e
 alias history='history -i'
 alias mv='mv -i'
 alias rm='rm -i'
-alias q='exit'
 alias c='clear'
 
 if [[ $(command -v eza) ]]; then
@@ -83,7 +82,7 @@ zi wait lucid for \
   zsh-users/zsh-syntax-highlighting \
   atload"_zsh_autosuggest_start" \
     zsh-users/zsh-autosuggestions \
-  atload"ZI[COMPINIT_OPTS]=-Uz; zicompinit; zicdreplay" blockf \
+  atload"ZI[COMPINIT_OPTS]=-u; zicompinit; zicdreplay" blockf \
     zsh-users/zsh-completions
 
 # Color
